@@ -5,3 +5,4 @@ Uses [Giphy](https://developers.giphy.com/) and [Discord's](https://discord.com/
 
 if you want to use you'll have to get your own API keys and bot tokens and pass them as variables
 
+🍜
