@@ -7,8 +7,7 @@ import discord
 
 # Get enviornmental variables and establish connection with discord
 load_dotenv()
-user_file = input("File: ")
-user_file_stripped = user_file.strip('"')
+user_file = input("File: ").strip('"')
 client = discord.Client()
 
 # Secret info
@@ -21,12 +20,12 @@ api_key = {
     'api_key': api
     }
 file = {
-    'file': open(user_file_stripped,'rb')
+    'file': open(user_file,'rb')
     }
 
 # Post clip to GIPHY, format response to get link, and send in discord
 def main():
-    video = moviepy.editor.VideoFileClip(user_file_stripped)
+    video = moviepy.editor.VideoFileClip(user_file)
     vid_len = int(video.duration)
     if vid_len > 15:
         print("GIPHY only allows for 15sec clips, please clip to under 15 until a better solution is found.")
