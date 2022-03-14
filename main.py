@@ -1,8 +1,8 @@
-import requests
-import os
+from discord import Webhook, RequestsWebhookAdapter
 from dotenv import load_dotenv
 import moviepy.editor
-from discord import webhook
+import requests
+import os
 
 # Get enviornmental variables and establish connection with discord
 load_dotenv()
@@ -11,7 +11,7 @@ user_file = input("File: ").strip('"')
 
 # Secret info
 api = os.getenv('API')
-#token = os.getenv('TOKEN')
+wh = os.getenv('WEBHOOK')
 
 # Prep data for POST requests
 giphy_url = 'https://upload.giphy.com/v1/gifs'
@@ -43,6 +43,7 @@ def main():
         gif_url = f'https://giphy.com/gifs/{url_id}'
     
         print('Posting Message...')
-
+        Webhook.from_url(wh, adapter=RequestsWebhookAdapter()).send(gif_url, username='test')
+        
 if __name__ == "__main__":
     main()
