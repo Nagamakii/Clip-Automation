@@ -1,26 +1,21 @@
-import requests
-import os
+from discord import Webhook, RequestsWebhookAdapter
 from dotenv import load_dotenv
 import moviepy.editor
-from discord import webhook
+import requests
+import os
 
 # Get enviornmental variables and establish connection with discord
 load_dotenv()
 user_file = input("File: ").strip('"')
-#client = discord.Client()
 
 # Secret info
 api = os.getenv('API')
-#token = os.getenv('TOKEN')
+wh = os.getenv('WEBHOOK')
 
 # Prep data for POST requests
 giphy_url = 'https://upload.giphy.com/v1/gifs'
-api_key = {
-    'api_key': api
-    }
-file = {
-    'file': open(user_file,'rb')
-    }
+api_key = {'api_key': api}
+file = {'file': open(user_file,'rb')}
 
 # Post clip to GIPHY, format response to get link, and send in discord
 def main():
@@ -32,10 +27,8 @@ def main():
     else:
         print('Clip is good!')
         print('Uploading and Encoding...')
-        gif_upload = requests.post(
-            giphy_url, data=api_key, files=file
-            )
-        print(gif_upload.status_code, gif_upload.text)
+        gif_upload = requests.post(giphy_url, data=api_key, files=file)
+        print(gif_upload.status_code)
         
         format_data = gif_upload.json()
         id = format_data['data']
@@ -43,6 +36,7 @@ def main():
         gif_url = f'https://giphy.com/gifs/{url_id}'
     
         print('Posting Message...')
-
+        Webhook.from_url(wh, adapter=RequestsWebhookAdapter()).send(gif_url, username='Clip Bot')
+        
 if __name__ == "__main__":
     main()
