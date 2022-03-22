@@ -1,33 +1,39 @@
+import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 from discord import Webhook, RequestsWebhookAdapter
 from dotenv import load_dotenv
 import moviepy.editor
 import requests
 import os
 
-# Get enviornmental variables and establish connection with discord
-load_dotenv()
-user_file = input("File: ").strip('"')
+load_dotenv() # Get enviornmental variables and establish connection with discord
 
-# Secret info
-api = os.getenv('API')
+api = os.getenv('API')  # Secret info
 wh = os.getenv('WEBHOOK')
+path = ('C:\\Users\\evanq\\Documents\\Code Projects\\Clip-Automation')
 
-# Prep data for POST requests
-giphy_url = 'https://upload.giphy.com/v1/gifs'
-api_key = {'api_key': api}
-file = {'file': open(user_file,'rb')}
+class Exeventhandler(FileSystemEventHandler):   # Establish event handler
+    def on_created(self, event):
+        main(event.src_path)
 
-# Post clip to GIPHY, format response to get link, and send in discord
-def main():
-    video = moviepy.editor.VideoFileClip(user_file)
+def main(file): # Post clip to GIPHY, format JSON response to get link, and send in discord
+    
+    # Prep data for POST requests
+    giphy_url = 'https://upload.giphy.com/v1/gifs'
+    api_key = {'api_key': api}
+    upload_file = {'file': open(file,'rb')}
+    
+    # Check video length
+    video = moviepy.editor.VideoFileClip(file)
     vid_len = int(video.duration)
+    
     if vid_len > 15:
         print("GIPHY only allows for 15sec clips, please clip to under 15 until a better solution is found.")
-        quit()
     else:
         print('Clip is good!')
         print('Uploading and Encoding...')
-        gif_upload = requests.post(giphy_url, data=api_key, files=file)
+        gif_upload = requests.post(giphy_url, data=api_key, files=upload_file)
         print(gif_upload.status_code)
         
         format_data = gif_upload.json()
@@ -37,6 +43,19 @@ def main():
     
         print('Posting Message...')
         Webhook.from_url(wh, adapter=RequestsWebhookAdapter()).send(gif_url, username='Clip Bot')
-        
+
 if __name__ == "__main__":
-    main()
+    observer = Observer()
+    event_handler = Exeventhandler() # create event handler
+    
+    # set observer to use created handler in directory
+    observer.schedule(event_handler, path=path)
+    observer.start()
+    
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+
+    observer.join()
