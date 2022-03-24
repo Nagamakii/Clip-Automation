@@ -1,17 +1,17 @@
-import time
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 from discord import Webhook, RequestsWebhookAdapter
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 from dotenv import load_dotenv
 import moviepy.editor
 import requests
+import time
 import os
 
 load_dotenv() # Get enviornmental variables and establish connection with discord
 
 api = os.getenv('API')  # Secret info
 wh = os.getenv('WEBHOOK')
-path = ('C:\\Users\\evanq\\Documents\\Code Projects\\Clip-Automation')
+path = ("Z:\pi-clips")
 
 class Exeventhandler(FileSystemEventHandler):   # Establish event handler
     def on_created(self, event):
